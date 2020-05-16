@@ -1,6 +1,8 @@
 # coding=utf-8
 import logging
 
+from django.core.exceptions import ObjectDoesNotExist
+
 
 _logger = logging.getLogger('api')
 
@@ -10,7 +12,7 @@ class Repository:
     _model = None
 
     @classmethod
-    def create(self, data, *args, **kwargs):
+    def create(cls, data, *args, **kwargs):
         """
         Apply for POST method
         :param dict|list data:
@@ -18,11 +20,11 @@ class Repository:
         :param kwargs:
         :return:
         """
-        result = self._model.objects.create(**data)
+        result = cls._model.objects.create(**data)
         return result
 
     @classmethod
-    def list(self, query=None, *args, **kwargs):
+    def list(cls, query=None, *args, **kwargs):
         """
         Apply for GET method
         :param dict|list query:
@@ -30,11 +32,11 @@ class Repository:
         :param kwargs:
         :return:
         """
-        result = self._model.objects.all()
+        result = cls._model.objects.all()
         return result
 
     @classmethod
-    def retrieve(self, record_id, *args, **kwargs):
+    def retrieve(cls, record_id, *args, **kwargs):
         """
         Apply for GET one item method
         :param record_id:
@@ -42,10 +44,15 @@ class Repository:
         :param kwargs:
         :return:
         """
-        return self._model.objects.get_or_404(id=record_id)
+        try:
+            result = cls._model.objects.get(id=record_id)
+        except ObjectDoesNotExist:
+            result = None
+
+        return result
 
     @classmethod
-    def update(self, record_id, data, *args, **kwargs):
+    def update(cls, record_id, data, *args, **kwargs):
         """
         Apply for PUT method
         :param record_id:
@@ -54,11 +61,15 @@ class Repository:
         :param kwargs:
         :return:
         """
-        record = self._model.objects.get(id=record_id)
+        record = cls._model.objects.all().filter(id=record_id)
+
+        if not record:
+            return False
+
         return record.update(**data)
 
     @classmethod
-    def destroy(self, record_id, *args, **kwargs):
+    def delete(cls, record_id, *args, **kwargs):
         """
         Apply DELETE method
         :param record_id:
@@ -66,4 +77,9 @@ class Repository:
         :param kwargs:
         :return:
         """
-        return self._model.objects.get(id=record_id)
+        record = cls._model.objects.all().filter(id=record_id)
+
+        if not record:
+            return False
+
+        return record.delete()

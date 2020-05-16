@@ -2,8 +2,12 @@
 import logging
 
 from django.db.models import QuerySet
+from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
+
+from api.extensions.response import HttpResponse
+
 
 _logger = logging.getLogger('api')
 
@@ -53,7 +57,10 @@ class CommonSingleView(CommonAPIView):
         Return single record.
         """
         result = self.repository.retrieve(record_id)
-        return Response(result)
+        if not result:
+            return HttpResponse(message='Not found', status=status.HTTP_404_NOT_FOUND)
+
+        return HttpResponse(data=self.serialize(result), status=status.HTTP_200_OK)
 
     def put(self, request, record_id, format=None):
         """
@@ -61,11 +68,32 @@ class CommonSingleView(CommonAPIView):
         """
         data = request.data
         result = self.repository.update(record_id, data)
-        return Response(result)
+
+        if result:
+            status_code = status.HTTP_200_OK
+            msg = 'Update Success'
+        elif result is False:
+            status_code = status.HTTP_404_NOT_FOUND
+            msg = 'Not Found'
+        else:
+            status_code = status.HTTP_400_BAD_REQUEST
+            msg = 'Update Failed'
+
+        return HttpResponse(message=msg, status=status_code)
 
     def delete(self, request, record_id, format=None):
         """
         Return single record.
         """
         result = self.repository.delete(record_id)
-        return Response(result)
+        if result:
+            status_code = status.HTTP_200_OK
+            msg = 'Delete Success'
+        elif result is False:
+            status_code = status.HTTP_404_NOT_FOUND
+            msg = 'Not Found'
+        else:
+            status_code = status.HTTP_400_BAD_REQUEST
+            msg = 'Delete Failed'
+
+        return HttpResponse(message=msg, status=status_code)

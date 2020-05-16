@@ -144,6 +144,10 @@ LOGGING = {
         },
     },
     'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
         'api': {
             'level': 'INFO',
             'handlers': os.environ.get('LOGGER_API_HANDLERS', 'console').split(','),
@@ -158,3 +162,7 @@ LOGGING = {
 }
 
 STATIC_ROOT = os.environ.get('STATIC_ROOT')
+
+REST_FRAMEWORK = {
+    'EXCEPTION_HANDLER': 'api.extensions.exceptions.api_exception_handler'
+}
