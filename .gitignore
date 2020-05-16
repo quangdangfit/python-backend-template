@@ -1,0 +1,13 @@
+# dotfiles
+.*
+!.gitignore
+!.env.sample
+# compiled python files
+*.py[co]
+__pycache__/
+# setup.py egg_info
+*.egg-info
+# SQLite DB file
+db.sqlite3
+#migrations
+api/migrations
