@@ -19,6 +19,7 @@ def api_exception_handler(exc, context):
 
     if isinstance(exc, Exception):
         set_rollback()
+        _logger.exception(repr(exc))
         return Response({'msg': 'Internal Server Error. Please contact to Admin!'}, status=500)
 
     return response

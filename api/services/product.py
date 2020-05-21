@@ -15,6 +15,7 @@ class ProductView(CommonView):
     """
     repository = ProductRepository
     serializer = ProductSerializer
+    fields_filter = ['code']
 
 
 class ProductSingleView(CommonSingleView):
