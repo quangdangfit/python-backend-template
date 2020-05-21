@@ -62,7 +62,6 @@ class Repository:
         :return:
         """
         record = cls._model.objects.all().filter(id=record_id)
-
         if not record:
             return False
 
@@ -78,7 +77,6 @@ class Repository:
         :return:
         """
         record = cls._model.objects.all().filter(id=record_id)
-
         if not record:
             return False
 
