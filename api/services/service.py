@@ -20,7 +20,7 @@ class CommonAPIView(APIView):
     serializer = None
 
     def serialize(self, records):
-        many = True if (isinstance(records, QuerySet) and records.count() > 1) else False
+        many = True if (isinstance(records, QuerySet)) else False
         return self.serializer(records, many=many).data
 
 
@@ -29,12 +29,14 @@ class CommonView(CommonAPIView):
         View to list all records of model in the system.
     """
     http_method_names = ['get', 'post']
+    fields_filter = []
 
     def get(self, request, format=None):
         """
         Return a list of all record.
         """
-        result = self.repository.list()
+        query = {field: request.query_params.get(field) for field in self.fields_filter}
+        result = self.repository.list(query=query)
         return Response(self.serialize(result))
 
     def post(self, request, format=None):

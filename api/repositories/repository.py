@@ -24,7 +24,7 @@ class Repository:
         return result
 
     @classmethod
-    def list(cls, query=None, *args, **kwargs):
+    def list(cls, *args, **kwargs):
         """
         Apply for GET method
         :param dict|list query:
@@ -32,7 +32,9 @@ class Repository:
         :param kwargs:
         :return:
         """
-        result = cls._model.objects.all()
+        query = kwargs.get('query', {})
+        result = cls._model.objects.filter(**query)
+
         return result
 
     @classmethod
