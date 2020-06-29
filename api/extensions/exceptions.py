@@ -1,8 +1,11 @@
 # coding=utf-8
 import logging
 
+from rest_framework import status
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import exception_handler, set_rollback
+from rest_framework_simplejwt.exceptions import InvalidToken
 
 
 _logger = logging.getLogger('api')
@@ -20,6 +23,18 @@ def api_exception_handler(exc, context):
     if isinstance(exc, Exception):
         set_rollback()
         _logger.exception(repr(exc))
-        return Response({'msg': 'Internal Server Error. Please contact to Admin!'}, status=500)
+        if isinstance(exc, ValidationError):
+            return wrap_response(repr(exc), status.HTTP_400_BAD_REQUEST)
+        elif isinstance(exc, InvalidToken):
+            return wrap_response(repr(exc), status.HTTP_401_UNAUTHORIZED)
+
+        return wrap_response("Internal Server Error. Please contact to Admin!", status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     return response
+
+
+def wrap_response(message, code):
+    return Response({
+        "message": message,
+        "code": code,
+    }, status=code)
